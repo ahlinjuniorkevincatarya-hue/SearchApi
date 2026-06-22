@@ -1,5 +1,6 @@
 package com.eqdom.foldersearch.service;
 
+import com.eqdom.foldersearch.ContractType;
 import com.eqdom.foldersearch.Statut;
 import com.eqdom.foldersearch.dto.ContratDto;
 import com.eqdom.foldersearch.entity.Client;
@@ -26,14 +27,18 @@ public class ContractService {
         this.pdfGenerator = pdfGenerator;
     }
 
-    public ContratDto generateContract(String numDossier)throws Exception{
+    public ContratDto generateContract(String numDossier, ContractType type)throws Exception{
         Context context = new Context();
 
         Dossier dossier = dossierRepository.findByNumDossier(numDossier).orElseThrow();
+        if(contractRepository.existsByDossierAndType(dossier, type)){
+            throw new RuntimeException("Contrat deja existant pour ce type");
+        }
         Client client = dossier.getClient();
 
         context.setVariable("dossier", dossier);
         context.setVariable("client", client);
+        context.setVariable("type", type);
 
         String html = templateEngine.process("contrat",context);
         String filename ="contrat_"+ numDossier + ".pdf";
@@ -42,7 +47,7 @@ public class ContractService {
 
         Contrat contrat = new Contrat();
         contrat.setNumContrat("C-" + numDossier);
-        contrat.setType("Contrat de crédit");
+        contrat.setType(ContractType.CREDIT);
         contrat.setStatut(Statut.EN_ATTENTE_DE_SIGNATURE);
         contrat.setDocumentOriginal(cheminPdf);
         contrat.setDocumentOriginal(cheminPdf);

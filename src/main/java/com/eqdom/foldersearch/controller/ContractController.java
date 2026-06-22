@@ -1,5 +1,6 @@
 package com.eqdom.foldersearch.controller;
 
+import com.eqdom.foldersearch.ContractType;
 import com.eqdom.foldersearch.dto.ContratDto;
 import com.eqdom.foldersearch.service.ContractService;
 import org.springframework.http.ResponseEntity;
@@ -16,9 +17,9 @@ public class ContractController {
         this.contractService = contractService;
     }
 
-    @PostMapping("/api/contrats/generate/{numDossier}")
-    public ResponseEntity<ContratDto> createContract(@PathVariable String numDossier) throws Exception{
+    @PostMapping("/api/contrats/generate/{numDossier}/{type}")
+    public ResponseEntity<ContratDto> createContract(@PathVariable String numDossier, @PathVariable ContractType type) throws Exception{
 
-        return ResponseEntity.ok( contractService.generateContract(numDossier));
+        return ResponseEntity.ok( contractService.generateContract(numDossier, type));
     }
 }

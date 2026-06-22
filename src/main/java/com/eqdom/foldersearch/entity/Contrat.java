@@ -1,5 +1,6 @@
 package com.eqdom.foldersearch.entity;
 
+import com.eqdom.foldersearch.ContractType;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -27,8 +28,9 @@ public class Contrat {
     private String numContrat;
 
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "type")
-    private String type;
+    private ContractType type;
 
 
     @Enumerated(EnumType.STRING)
