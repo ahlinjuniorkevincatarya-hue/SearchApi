@@ -39,4 +39,10 @@ public class Contrat {
     @ManyToOne
     @JoinColumn(name = "dossier_id", nullable = false)
     private Dossier dossier;
+
+    @Column(name = "document_original")
+    private String documentOriginal;
+
+    @Column(name = "document_signe")
+    private String documentSigne;
 }

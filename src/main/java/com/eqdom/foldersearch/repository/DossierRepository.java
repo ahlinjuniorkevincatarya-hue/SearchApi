@@ -9,4 +9,5 @@ import java.util.Optional;
 @Repository
 public interface DossierRepository extends JpaRepository<Dossier, Long> {
     Optional<Dossier> findByNumDossier(String numDossier);
+    boolean existsByNumDossier(String numDossier);
 }
