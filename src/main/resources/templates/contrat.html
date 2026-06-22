@@ -1,10 +1,86 @@
 <!DOCTYPE html>
-<html lang="en">
+<html xmlns:th="http://www.thymeleaf.org">
+
 <head>
-    <meta charset="UTF-8">
-    <title>Title</title>
+    <meta charset="UTF-8"/>
+    <title>Contrat de crédit</title>
+
+    <style>
+        body {
+            font-family: Arial;
+            margin: 40px;
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        .section {
+            margin-top: 30px;
+        }
+
+        .ligne {
+            margin: 10px 0;
+        }
+    </style>
+
 </head>
+
 <body>
 
+
+<h1>Contrat de crédit</h1>
+
+
+<div class="section">
+
+    <h2>Informations client</h2>
+
+    <div class="ligne">
+        Nom :
+        <span th:text="${client.nom}"></span>
+    </div>
+
+    <div class="ligne">
+        Prénoms :
+        <span th:text="${client.prenoms}"></span>
+    </div>
+
+    <div class="ligne">
+        CIN :
+        <span th:text="${client.cni}"></span>
+    </div>
+
+</div>
+
+
+
+<div class="section">
+
+    <h2>Informations crédit</h2>
+
+    <div class="ligne">
+        Montant :
+        <span th:text="${dossier.montant}"></span> DH
+    </div>
+
+    <div class="ligne">
+        Numéro dossier :
+        <span th:text="${dossier.numDossier}"></span>
+    </div>
+
+</div>
+
+
+
+<div class="section">
+
+    Date :
+    <span th:text="${date}"></span>
+
+</div>
+
+
 </body>
+
 </html>
