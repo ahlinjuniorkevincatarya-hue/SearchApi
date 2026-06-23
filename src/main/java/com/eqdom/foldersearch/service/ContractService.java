@@ -19,21 +19,27 @@ public class ContractService {
     private final ContratRepository contractRepository;
     private final TemplateEngine templateEngine;
     private final PdfGenerator pdfGenerator;
+    private final MinioService minioService;
 
-    public ContractService(DossierRepository dossierRepository,ContratRepository contractRepository, TemplateEngine templateEngine, PdfGenerator pdfGenerator) {
+    public ContractService(DossierRepository dossierRepository,ContratRepository contractRepository, TemplateEngine templateEngine, PdfGenerator pdfGenerator, MinioService minioService) {
         this.dossierRepository = dossierRepository;
         this.contractRepository = contractRepository;
         this.templateEngine = templateEngine;
         this.pdfGenerator = pdfGenerator;
+        this.minioService = minioService;
     }
 
     public ContratDto generateContract(String numDossier, ContractType type)throws Exception{
-        Context context = new Context();
 
+        Context context = new Context();
         Dossier dossier = dossierRepository.findByNumDossier(numDossier).orElseThrow();
+        String reference = "CTR-" + dossier.getNumDossier()+"-"+type.name();
+
+
         if(contractRepository.existsByDossierAndType(dossier, type)){
             throw new RuntimeException("Contrat deja existant pour ce type");
         }
+
         Client client = dossier.getClient();
 
         context.setVariable("dossier", dossier);
@@ -41,26 +47,28 @@ public class ContractService {
         context.setVariable("type", type);
 
         String html = templateEngine.process("contrat",context);
-        String filename ="contrat_"+ numDossier + ".pdf";
 
-        String cheminPdf = pdfGenerator.generatePdf(html,filename);
+        byte[] pdf = pdfGenerator.generatePdf(html);
+
+        String key = "contracts/"+reference+".pdf";
+
+        minioService.uploadFile(key,pdf);
 
         Contrat contrat = new Contrat();
-        contrat.setNumContrat("C-" + numDossier);
-        contrat.setType(ContractType.CREDIT);
+
+        contrat.setReferenceContrat(reference);
+        contrat.setType(type);
         contrat.setStatut(Statut.EN_ATTENTE_DE_SIGNATURE);
-        contrat.setDocumentOriginal(cheminPdf);
-        contrat.setDocumentOriginal(cheminPdf);
+        contrat.setDocumentOriginal(key);
         contrat.setDossier(dossier);
 
         Contrat saved = contractRepository.save(contrat);
 
         ContratDto dto = new ContratDto();
 
-        dto.setNumContrat(saved.getNumContrat());
+        dto.setReferenceContrat(saved.getReferenceContrat());
         dto.setType(saved.getType());
         dto.setStatut(saved.getStatut().name());
-
         dto.setNumDossier(saved.getDossier().getNumDossier());
         dto.setNomClient(saved.getDossier().getClient().getNom());
 

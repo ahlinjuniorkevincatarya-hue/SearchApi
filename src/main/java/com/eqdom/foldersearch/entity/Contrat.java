@@ -22,10 +22,11 @@ public class Contrat {
 
 
     @Column(
-            name = "num_contrat",
-            unique = true
+            name = "reference_contrat",
+            unique = true,
+            nullable = false
     )
-    private String numContrat;
+    private String referenceContrat;
 
 
     @Enumerated(EnumType.STRING)

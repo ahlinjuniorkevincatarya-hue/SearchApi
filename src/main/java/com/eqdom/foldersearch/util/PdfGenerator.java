@@ -3,22 +3,22 @@ package com.eqdom.foldersearch.util;
 import org.springframework.stereotype.Component;
 
 import com.openhtmltopdf.pdfboxout.PdfRendererBuilder;
-import java.io.FileOutputStream;
+
+import java.io.ByteArrayOutputStream;
 
 @Component
 public class PdfGenerator {
 
-    public String generatePdf(String html, String filename)throws Exception{
-        String path = "documents/contracts/"+filename;
-        FileOutputStream output = new FileOutputStream(path);
+    public byte[] generatePdf(String html)throws Exception{
+
+        ByteArrayOutputStream output = new ByteArrayOutputStream();
+
         PdfRendererBuilder builder = new PdfRendererBuilder();
 
         builder.withHtmlContent(html,null).toStream(output).run();
 
-        output.close();
 
-        return path;
-
+        return output.toByteArray();
 
     }
 }

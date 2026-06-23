@@ -5,7 +5,7 @@ import lombok.Data;
 
 @Data
 public class ContratDto {
-    private String numContrat;
+    private String referenceContrat;
     private ContractType type;
     private String statut;
 
