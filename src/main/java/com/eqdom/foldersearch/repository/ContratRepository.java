@@ -9,6 +9,4 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface ContratRepository extends JpaRepository<Contrat, Long> {
     boolean existsByDossierAndType(Dossier dossier, ContractType type);
-
-    ContractType type(ContractType type);
 }

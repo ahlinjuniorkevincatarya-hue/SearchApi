@@ -6,6 +6,7 @@ import com.eqdom.foldersearch.dto.ContratDto;
 import com.eqdom.foldersearch.entity.Client;
 import com.eqdom.foldersearch.entity.Contrat;
 import com.eqdom.foldersearch.entity.Dossier;
+import com.eqdom.foldersearch.mapper.ContractMapper;
 import com.eqdom.foldersearch.repository.ContratRepository;
 import com.eqdom.foldersearch.repository.DossierRepository;
 import org.springframework.stereotype.Service;
@@ -20,13 +21,15 @@ public class ContractService {
     private final TemplateEngine templateEngine;
     private final PdfGenerator pdfGenerator;
     private final MinioService minioService;
+    private final ContractMapper contractMapper;
 
-    public ContractService(DossierRepository dossierRepository,ContratRepository contractRepository, TemplateEngine templateEngine, PdfGenerator pdfGenerator, MinioService minioService) {
+    public ContractService(DossierRepository dossierRepository,ContratRepository contractRepository, TemplateEngine templateEngine, PdfGenerator pdfGenerator, MinioService minioService, ContractMapper contractMapper) {
         this.dossierRepository = dossierRepository;
         this.contractRepository = contractRepository;
         this.templateEngine = templateEngine;
         this.pdfGenerator = pdfGenerator;
         this.minioService = minioService;
+        this.contractMapper = contractMapper;
     }
 
     public ContratDto generateContract(String numDossier, ContractType type)throws Exception{
@@ -64,15 +67,7 @@ public class ContractService {
 
         Contrat saved = contractRepository.save(contrat);
 
-        ContratDto dto = new ContratDto();
-
-        dto.setReferenceContrat(saved.getReferenceContrat());
-        dto.setType(saved.getType());
-        dto.setStatut(saved.getStatut().name());
-        dto.setNumDossier(saved.getDossier().getNumDossier());
-        dto.setNomClient(saved.getDossier().getClient().getNom());
-
-        return dto;
+        return contractMapper.toDto(saved);
     }
 
 
