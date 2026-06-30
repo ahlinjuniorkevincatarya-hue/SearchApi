@@ -1,11 +1,13 @@
 package com.eqdom.foldersearch.service;
 
+import io.minio.GetObjectArgs;
 import io.minio.MinioClient;
 import io.minio.PutObjectArgs;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayInputStream;
+import io.minio.GetObjectResponse;
 
 @Service
 public class MinioService {
@@ -31,8 +33,14 @@ public class MinioService {
         return key;
     }
 
-    public void testUpload() throws Exception{
-        String text = "hello minio";
-        uploadFile("test.txt", text.getBytes());
+    public byte[] downloadFile(String key) throws Exception {
+        try (GetObjectResponse response = minioClient.getObject(
+                GetObjectArgs.builder()
+                        .bucket(bucket)
+                        .object(key)
+                        .build())
+        ) {
+            return response.readAllBytes();
+        }
     }
 }

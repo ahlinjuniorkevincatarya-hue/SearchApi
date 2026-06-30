@@ -2,24 +2,30 @@ package com.eqdom.foldersearch.controller;
 
 import com.eqdom.foldersearch.ContractType;
 import com.eqdom.foldersearch.dto.ContratDto;
-import com.eqdom.foldersearch.service.ContractService;
+import com.eqdom.foldersearch.service.ContratService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
+@RequestMapping("api/contrats")
 public class ContractController {
 
-    private final ContractService contractService;
+    private final ContratService contractService;
 
-    public ContractController(ContractService contractService){
+    public ContractController(ContratService contractService){
         this.contractService = contractService;
     }
 
-    @PostMapping("/api/contrats/generate/{numDossier}/{type}")
+    @PostMapping("/generate/{numDossier}/{type}")
     public ResponseEntity<ContratDto> createContract(@PathVariable String numDossier, @PathVariable ContractType type) throws Exception{
 
         return ResponseEntity.ok( contractService.generateContract(numDossier, type));
+    }
+
+    @GetMapping("/{referenceContrat}/pdf")
+    public ResponseEntity<byte[]> getPdf(@PathVariable String referenceContrat) throws Exception{
+        return ResponseEntity.ok()
+                .header("content-Type","application/pdf")
+                .body(contractService.getPdf(referenceContrat));
     }
 }

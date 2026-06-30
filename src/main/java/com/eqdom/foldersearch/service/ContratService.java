@@ -6,6 +6,8 @@ import com.eqdom.foldersearch.dto.ContratDto;
 import com.eqdom.foldersearch.entity.Client;
 import com.eqdom.foldersearch.entity.Contrat;
 import com.eqdom.foldersearch.entity.Dossier;
+import com.eqdom.foldersearch.exception.DuplicateResourceException;
+import com.eqdom.foldersearch.exception.ResourceNotFoundException;
 import com.eqdom.foldersearch.mapper.ContractMapper;
 import com.eqdom.foldersearch.repository.ContratRepository;
 import com.eqdom.foldersearch.repository.DossierRepository;
@@ -15,7 +17,7 @@ import org.thymeleaf.context.Context;
 import com.eqdom.foldersearch.util.PdfGenerator;
 
 @Service
-public class ContractService {
+public class ContratService {
     private final DossierRepository dossierRepository;
     private final ContratRepository contractRepository;
     private final TemplateEngine templateEngine;
@@ -23,7 +25,7 @@ public class ContractService {
     private final MinioService minioService;
     private final ContractMapper contractMapper;
 
-    public ContractService(DossierRepository dossierRepository,ContratRepository contractRepository, TemplateEngine templateEngine, PdfGenerator pdfGenerator, MinioService minioService, ContractMapper contractMapper) {
+    public ContratService(DossierRepository dossierRepository,ContratRepository contractRepository, TemplateEngine templateEngine, PdfGenerator pdfGenerator, MinioService minioService, ContractMapper contractMapper) {
         this.dossierRepository = dossierRepository;
         this.contractRepository = contractRepository;
         this.templateEngine = templateEngine;
@@ -40,7 +42,7 @@ public class ContractService {
 
 
         if(contractRepository.existsByDossierAndType(dossier, type)){
-            throw new RuntimeException("Contrat deja existant pour ce type");
+            throw new DuplicateResourceException("Contrat deja existant pour ce type");
         }
 
         Client client = dossier.getClient();
@@ -68,6 +70,19 @@ public class ContractService {
         Contrat saved = contractRepository.save(contrat);
 
         return contractMapper.toDto(saved);
+    }
+
+    public byte[] getPdf(String referenceContrat) throws Exception{
+        Contrat contrat = contractRepository
+                    .findByReferenceContrat(referenceContrat)
+                    .orElseThrow(()-> new ResourceNotFoundException("contrat " + referenceContrat + " introuvable"));
+
+        String documentKey;
+
+        documentKey = contrat.getDocumentOriginal();
+
+        return minioService.downloadFile(documentKey);
+
     }
 
 
