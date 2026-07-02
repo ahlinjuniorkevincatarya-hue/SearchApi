@@ -2,7 +2,10 @@ package com.eqdom.foldersearch.service;
 
 import com.eqdom.foldersearch.ContractType;
 import com.eqdom.foldersearch.Statut;
+import com.eqdom.foldersearch.client.SignatureClient;
 import com.eqdom.foldersearch.dto.ContratDto;
+import com.eqdom.foldersearch.dto.SignatureRequest;
+import com.eqdom.foldersearch.dto.SignatureResponse;
 import com.eqdom.foldersearch.entity.Client;
 import com.eqdom.foldersearch.entity.Contrat;
 import com.eqdom.foldersearch.entity.Dossier;
@@ -24,14 +27,16 @@ public class ContratService {
     private final PdfGenerator pdfGenerator;
     private final MinioService minioService;
     private final ContractMapper contractMapper;
+    private final SignatureClient signatureClient;
 
-    public ContratService(DossierRepository dossierRepository,ContratRepository contractRepository, TemplateEngine templateEngine, PdfGenerator pdfGenerator, MinioService minioService, ContractMapper contractMapper) {
+    public ContratService(DossierRepository dossierRepository,ContratRepository contractRepository, TemplateEngine templateEngine, PdfGenerator pdfGenerator, MinioService minioService, ContractMapper contractMapper,SignatureClient signatureClient) {
         this.dossierRepository = dossierRepository;
         this.contractRepository = contractRepository;
         this.templateEngine = templateEngine;
         this.pdfGenerator = pdfGenerator;
         this.minioService = minioService;
         this.contractMapper = contractMapper;
+        this.signatureClient = signatureClient;
     }
 
     public ContratDto generateContract(String numDossier, ContractType type)throws Exception{
@@ -55,7 +60,7 @@ public class ContratService {
 
         byte[] pdf = pdfGenerator.generatePdf(html);
 
-        String key = "contracts/"+reference+".pdf";
+        String key =reference+".pdf";
 
         minioService.uploadFile(key,pdf);
 
@@ -83,6 +88,30 @@ public class ContratService {
 
         return minioService.downloadFile(documentKey);
 
+    }
+
+    public SignatureResponse requestSignature(String referenceContrat) throws Exception {
+
+        Contrat contrat = contractRepository.findByReferenceContrat(referenceContrat)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Contrat " + referenceContrat + " introuvable"));
+
+        if (contrat.getStatut() != Statut.EN_ATTENTE_DE_SIGNATURE) {
+            throw new IllegalStateException("Le contrat n'est pas en attente de signature.");
+        }
+
+        byte[] pdf = minioService.downloadFile(contrat.getDocumentOriginal());
+
+        SignatureRequest request = new SignatureRequest();
+
+        request.setDocumentId(contrat.getReferenceContrat());
+
+        // Temporaire
+        request.setSignataireEmail("test@gmail.com");
+
+        request.setPdf(pdf);
+
+        return signatureClient.requestSignature(request);
     }
 
 

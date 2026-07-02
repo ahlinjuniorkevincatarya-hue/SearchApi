@@ -1,0 +1,25 @@
+package com.eqdom.foldersearch.client;
+
+import com.eqdom.foldersearch.dto.SignatureRequest;
+import com.eqdom.foldersearch.dto.SignatureResponse;
+import org.springframework.stereotype.Component;
+import org.springframework.web.client.RestClient;
+
+@Component
+public class SignatureClient {
+
+    private final RestClient restClient;
+
+    public SignatureClient(RestClient restClient) {
+        this.restClient = restClient;
+    }
+
+    public SignatureResponse requestSignature(SignatureRequest request) {
+
+        return restClient.post()
+                .uri("/api/signatures")
+                .body(request)
+                .retrieve()
+                .body(SignatureResponse.class);
+    }
+}

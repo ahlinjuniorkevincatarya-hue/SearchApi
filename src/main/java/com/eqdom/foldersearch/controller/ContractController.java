@@ -2,6 +2,7 @@ package com.eqdom.foldersearch.controller;
 
 import com.eqdom.foldersearch.ContractType;
 import com.eqdom.foldersearch.dto.ContratDto;
+import com.eqdom.foldersearch.dto.SignatureResponse;
 import com.eqdom.foldersearch.service.ContratService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -27,5 +28,12 @@ public class ContractController {
         return ResponseEntity.ok()
                 .header("content-Type","application/pdf")
                 .body(contractService.getPdf(referenceContrat));
+    }
+
+    @PostMapping("/{referenceContrat}/signature")
+    public SignatureResponse signer(@PathVariable String referenceContrat)
+            throws Exception {
+
+        return contractService.requestSignature(referenceContrat);
     }
 }
