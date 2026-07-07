@@ -22,4 +22,13 @@ public class SignatureClient {
                 .retrieve()
                 .body(SignatureResponse.class);
     }
+
+    public void afterSignature(String referenceContrat) {
+
+        restClient.post()
+                .uri("/api/signatures/afterSignature/" + referenceContrat)
+                .retrieve()
+                .toBodilessEntity();
+
+    }
 }

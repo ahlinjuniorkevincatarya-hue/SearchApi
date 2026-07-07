@@ -48,4 +48,7 @@ public class Contrat {
 
     @Column(name = "document_signe")
     private String documentSigne;
+
+    @Column(name = "envelope_id")
+    private String envelopeId;
 }

@@ -36,4 +36,33 @@ public class ContractController {
 
         return contractService.requestSignature(referenceContrat);
     }
+
+    @PutMapping("/{referenceContrat}/envelope")
+    public void saveEnvelopeId(@PathVariable String referenceContrat, @RequestBody String envelopeId) throws Exception {
+        contractService.saveEnvelopeId(referenceContrat, envelopeId);
+    }
+
+    @GetMapping("{referenceContrat}/envelopeId")
+    public String getEnvelopeId(@PathVariable String referenceContrat) throws Exception {
+        return contractService.getEnvelopeId(referenceContrat);
+    }
+
+    @PutMapping("/{referenceContrat}/signed")
+    public void saveSignedDocument(@PathVariable String referenceContrat, @RequestBody byte[] pdf) throws Exception {
+        contractService.saveSignedDocument(referenceContrat,pdf);
+    }
+
+    @PostMapping("/{referenceContrat}/afterSignature")
+    public void afterSignature(@PathVariable String referenceContrat) throws Exception {
+        contractService.afterSignature(referenceContrat);
+    }
+
+    @GetMapping("/{referenceContrat}/signed")
+    public ResponseEntity<byte[]> getSignedPdf(@PathVariable String referenceContrat) throws Exception {
+
+        return ResponseEntity.ok()
+                .header("Content-Type", "application/pdf")
+                .body(contractService.getSignedPdf(referenceContrat));
+    }
+
 }

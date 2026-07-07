@@ -107,12 +107,62 @@ public class ContratService {
         request.setDocumentId(contrat.getReferenceContrat());
 
         // Temporaire
-        request.setSignataireEmail("test@gmail.com");
+        request.setSignataireEmail("tpktheone@gmail.com");
 
         request.setPdf(pdf);
 
         return signatureClient.requestSignature(request);
     }
+
+    public void saveEnvelopeId(String referenceContrat, String envelopeId) throws Exception {
+        Contrat contrat = contractRepository.findByReferenceContrat(referenceContrat).orElseThrow(()-> new ResourceNotFoundException("contrat " + referenceContrat + " introuvable"));
+        contrat.setEnvelopeId(envelopeId);
+        contractRepository.save(contrat);
+    }
+
+    public String getEnvelopeId(String referenceContrat) throws Exception {
+        Contrat contrat = contractRepository.findByReferenceContrat(referenceContrat).orElseThrow(() -> new ResourceNotFoundException("contrat " + referenceContrat + " introuvable"));
+        return contrat.getEnvelopeId();
+    }
+
+    public void saveSignedDocument(String referenceContrat, byte[] pdf) throws Exception {
+
+        Contrat contrat = contractRepository
+                .findByReferenceContrat(referenceContrat)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Contrat " + referenceContrat + " introuvable"));
+
+        String key = "CTR-" + referenceContrat + "-signed.pdf";
+
+        key = minioService.uploadFile(key, pdf);
+
+        contrat.setDocumentSigne(key);
+
+        contrat.setStatut(Statut.SIGNE);
+
+        contractRepository.save(contrat);
+    }
+
+    public void afterSignature(String referenceContrat) {
+
+        signatureClient.afterSignature(referenceContrat);
+
+    }
+
+    public byte[] getSignedPdf(String referenceContrat) throws Exception {
+
+        Contrat contrat = contractRepository
+                .findByReferenceContrat(referenceContrat)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Contrat " + referenceContrat + " introuvable"));
+
+        if (contrat.getDocumentSigne() == null) {
+            throw new IllegalStateException("Le contrat n'est pas encore signé.");
+        }
+
+        return minioService.downloadFile(contrat.getDocumentSigne());
+    }
+
 
 
 }
