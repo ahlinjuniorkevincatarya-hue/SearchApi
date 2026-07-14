@@ -31,4 +31,12 @@ public class SignatureClient {
                 .toBodilessEntity();
 
     }
+
+    public String getSignatureUrl(String referenceContrat) {
+
+        return restClient.get()
+                .uri("/api/signatures/signatureUrl/" + referenceContrat)
+                .retrieve()
+                .body(String.class);
+    }
 }

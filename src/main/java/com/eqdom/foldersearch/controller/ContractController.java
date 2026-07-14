@@ -65,4 +65,16 @@ public class ContractController {
                 .body(contractService.getSignedPdf(referenceContrat));
     }
 
+    @GetMapping("/{referenceContrat}/signatureUrl")
+    public String getSignatureUrl(@PathVariable String referenceContrat) throws Exception {
+        return contractService.getSignatureUrl(referenceContrat);
+    }
+
+    @GetMapping("/{referenceContrat}/dossier")
+    public String getNumDossier(
+            @PathVariable String referenceContrat) {
+
+        return contractService.getNumDossier(referenceContrat);
+    }
+
 }

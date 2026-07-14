@@ -1,11 +1,15 @@
 package com.eqdom.foldersearch.service;
 
+import com.eqdom.foldersearch.Statut;
 import com.eqdom.foldersearch.dto.DossierDto;
+import com.eqdom.foldersearch.entity.Contrat;
 import com.eqdom.foldersearch.entity.Dossier;
 import com.eqdom.foldersearch.exception.ResourceNotFoundException;
 import com.eqdom.foldersearch.mapper.DossierMapper;
 import com.eqdom.foldersearch.repository.DossierRepository;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 
 @Service

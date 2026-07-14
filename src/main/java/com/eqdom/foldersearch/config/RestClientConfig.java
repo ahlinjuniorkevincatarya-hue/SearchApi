@@ -15,6 +15,8 @@ public class RestClientConfig {
     public RestClient restClient() {
         return RestClient.builder()
                 .baseUrl(signatureServiceUrl)
+                .requestInterceptor(new LoggingInterceptor())
                 .build();
     }
+
 }

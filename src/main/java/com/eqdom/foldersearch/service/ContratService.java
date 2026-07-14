@@ -19,6 +19,8 @@ import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 import com.eqdom.foldersearch.util.PdfGenerator;
 
+import java.util.List;
+
 @Service
 public class ContratService {
     private final DossierRepository dossierRepository;
@@ -37,6 +39,33 @@ public class ContratService {
         this.minioService = minioService;
         this.contractMapper = contractMapper;
         this.signatureClient = signatureClient;
+    }
+
+    public String getNumDossier(String referenceContrat) {
+
+        Contrat contrat = contractRepository
+                .findByReferenceContrat(referenceContrat)
+                .orElseThrow(() ->
+                        new RuntimeException("Contrat introuvable"));
+
+        return contrat.getDossier().getNumDossier();
+    }
+
+    public void updateStatutDossier(Dossier dossier) {
+
+        List<Contrat> contrats = dossier.getContrats();
+
+        if (contrats.isEmpty()) {
+            dossier.setStatut(Statut.VIDE);
+        }
+        else if (contrats.stream().allMatch(c -> c.getStatut() == Statut.SIGNE)) {
+            dossier.setStatut(Statut.SIGNE);
+        }
+        else {
+            dossier.setStatut(Statut.EN_ATTENTE_DE_SIGNATURE);
+        }
+
+        dossierRepository.save(dossier);
     }
 
     public ContratDto generateContract(String numDossier, ContractType type)throws Exception{
@@ -73,6 +102,7 @@ public class ContratService {
         contrat.setDossier(dossier);
 
         Contrat saved = contractRepository.save(contrat);
+        updateStatutDossier(dossier);
 
         return contractMapper.toDto(saved);
     }
@@ -141,6 +171,7 @@ public class ContratService {
         contrat.setStatut(Statut.SIGNE);
 
         contractRepository.save(contrat);
+        updateStatutDossier(contrat.getDossier());
     }
 
     public void afterSignature(String referenceContrat) {
@@ -163,6 +194,9 @@ public class ContratService {
         return minioService.downloadFile(contrat.getDocumentSigne());
     }
 
+    public String getSignatureUrl(String referenceContrat) throws Exception {
+        return signatureClient.getSignatureUrl(referenceContrat);
+    }
 
 
 }

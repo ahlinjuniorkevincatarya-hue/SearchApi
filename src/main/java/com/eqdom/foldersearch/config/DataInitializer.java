@@ -47,7 +47,7 @@ public class DataInitializer implements CommandLineRunner {
             dossier1.setNumDossier("EQ-2026-001");
             dossier1.setClient(client1);
             dossier1.setMontant(29000.0);
-            dossier1.setStatut(Statut.EN_ATTENTE_DE_SIGNATURE);
+            dossier1.setStatut(Statut.VIDE);
             dossier1.setDateCreation(LocalDateTime.now());
             dossierRepository.save(dossier1);
         }
@@ -76,7 +76,7 @@ public class DataInitializer implements CommandLineRunner {
             dossier2.setNumDossier("EQ-2026-002");
             dossier2.setClient(client2);
             dossier2.setMontant(120000.0);
-            dossier2.setStatut(Statut.SIGNE);
+            dossier2.setStatut(Statut.VIDE);
             dossier2.setDateCreation(LocalDateTime.now());
             dossierRepository.save(dossier2);
         }
@@ -102,7 +102,7 @@ public class DataInitializer implements CommandLineRunner {
             dossier3.setNumDossier("EQ-2026-003");
             dossier3.setClient(client3);
             dossier3.setMontant(28942.0);
-            dossier3.setStatut(Statut.EN_ATTENTE_DE_SIGNATURE);
+            dossier3.setStatut(Statut.VIDE);
             dossier3.setDateCreation(LocalDateTime.now());
             dossierRepository.save(dossier3);
         }
