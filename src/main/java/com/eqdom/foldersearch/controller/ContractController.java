@@ -6,6 +6,7 @@ import com.eqdom.foldersearch.dto.SignatureResponse;
 import com.eqdom.foldersearch.service.ContratService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 @RestController
 @RequestMapping("api/contrats")
@@ -17,6 +18,7 @@ public class ContractController {
         this.contractService = contractService;
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/generate/{numDossier}/{type}")
     public ResponseEntity<ContratDto> createContract(@PathVariable String numDossier, @PathVariable ContractType type) throws Exception{
 
